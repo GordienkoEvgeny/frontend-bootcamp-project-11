@@ -25,6 +25,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - run: make install
-      - run: make build
-      - run: make lint
+      - run: npm run ci
+      - run: npm run build
+      - run: npx run eslint .
