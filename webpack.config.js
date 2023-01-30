@@ -1,5 +1,5 @@
 // Generated using webpack-cli https://github.com/webpack/webpack-cli
-
+const autoprefixer = require('autoprefixer');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
@@ -43,12 +43,7 @@ const config = {
             // `postcssOptions` требуется для postcss 8.x;
             // если Вы используете postcss 7.x пропустите ключ
             postcssOptions: {
-              // плагины postcss, можно экспортировать в postcss.config.js
-              plugins() {
-                return [
-                  require('autoprefixer'),
-                ];
-              },
+              plugins: () => [autoprefixer],
             },
           },
         }, {
