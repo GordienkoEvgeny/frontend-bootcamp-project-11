@@ -31,6 +31,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      -run: make install
-      -run: make lint
-      -run: make build
+      -run: npm run build
+      -run: npm run lint
+      -run: npm run install

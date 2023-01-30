@@ -3,6 +3,7 @@
   "description": "My webpack project",
   "name": "my-webpack-project",
   "scripts": {
+    "install": "npm ci",
     "lint": "npx eslint .",
     "build": "webpack --mode=production --node-env=production",
     "build:dev": "webpack --mode=development",
