@@ -1,7 +1,11 @@
-lint:
-	npm eslint .
-run:
-	npm run build
-
 install:
 	npm ci
+
+build:
+	npm build
+
+lint:
+	npx eslint .
+
+
+
