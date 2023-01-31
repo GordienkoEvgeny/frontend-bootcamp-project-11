@@ -1,25 +1,33 @@
 {
+  "name": "@hexlet/code",
   "version": "1.0.0",
-  "description": "My webpack project",
-  "name": "my-webpack-project",
+  "description": "RSS aggregator project",
+  "main": "src/index.js",
   "scripts": {
-    "install": "npm ci",
-    "lint": "npx eslint .",
-    "build": "webpack --mode=production --node-env=production",
-    "build:dev": "webpack --mode=development",
-    "build:prod": "webpack --mode=production --node-env=production",
-    "watch": "webpack --watch",
-    "serve": "webpack serve"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "develop": "npx webpack serve",
+    "build": "webpack --mode production"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asenka0301/frontend-bootcamp-project-11.git"
+  },
+  "author": "Anastasia Simonova",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asenka0301/frontend-bootcamp-project-11/issues"
+  },
+  "type": "module",
+  "homepage": "https://github.com/asenka0301/frontend-bootcamp-project-11#readme",
   "devDependencies": {
+    "@webpack-cli/generators": "^3.0.1",
+    "autoprefixer": "^10.4.13",
     "css-loader": "^6.7.3",
-    "eslint": "8.22.0",
+    "eslint": "^8.32.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.27.5",
     "html-webpack-plugin": "^5.5.0",
-    "postcss": "^8.4.21",
     "postcss-loader": "^7.0.2",
-    "prettier": "^2.8.0",
     "sass": "^1.57.1",
     "sass-loader": "^13.2.0",
     "style-loader": "^3.3.1",
@@ -30,8 +38,10 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.6",
-    "autoprefixer": "^10.4.13",
     "bootstrap": "^5.2.3",
-    "jquery": "^3.6.3"
+    "i18next": "^22.4.9",
+    "lodash": "^4.17.21",
+    "on-change": "^4.0.2",
+    "yup": "^0.32.11"
   }
 }
