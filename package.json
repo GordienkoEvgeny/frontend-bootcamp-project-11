@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/asenka0301/frontend-bootcamp-project-11.git"
+    "url": "https://github.com/GordienkoEvgeny/frontend-bootcamp-project-11.git"
   },
   "author": "Anastasia Simonova",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/asenka0301/frontend-bootcamp-project-11/issues"
+    "url": "https://github.com/GordienkoEvgeny/frontend-bootcamp-project-11.git"
   },
   "type": "module",
-  "homepage": "https://github.com/asenka0301/frontend-bootcamp-project-11#readme",
+  "homepage": "https://github.com/GordienkoEvgeny/frontend-bootcamp-project-11.git#readme",
   "devDependencies": {
     "@webpack-cli/generators": "^3.0.1",
     "autoprefixer": "^10.4.13",
