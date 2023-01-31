@@ -1,7 +1,7 @@
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/GordienkoEvgeny/frontend-bootcamp-project-11/workflows/hexlet-check/badge.svg)](https://github.com/GordienkoEvgeny/frontend-bootcamp-project-11/actions)
 ### Maintainability Badge:
-[![Node CI](https://github.com/GordienkoEvgeny/frontend-bootcamp-project-11/actions/workflows/workflow.yml/badge.svg)](https://github.com/GordienkoEvgeny/frontend-bootcamp-project-11/actions/workflows/workflow.yml)
+[![Maintainability](https://api.codeclimate.com/v1/badges/25d027eed0ddb44aac01/maintainability)](https://codeclimate.com/github/GordienkoEvgeny/frontend-bootcamp-project-11/maintainability)
 ### Workflows:
 [![.github/workflows/workflow.yml](https://github.com/GordienkoEvgeny/frontend-bootcamp-project-11/actions/workflows/workflow.yml/badge.svg)](https://github.com/GordienkoEvgeny/frontend-bootcamp-project-11/actions/workflows/workflow.yml)
 ### link to RSS agregator

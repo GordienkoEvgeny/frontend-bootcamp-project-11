@@ -1,1 +1,86 @@
 @import "~bootstrap/scss/bootstrap";
+.bc {
+  border-color: #eb9d18;
+}
+
+.green {
+  color: greenyellow;
+}
+
+.blink {
+  -webkit-animation: blink 1s linear infinite;
+  animation: blink 1s linear infinite;
+  font-weight: normal;
+}
+
+@-webkit-keyframes blink {
+  0% { color: #F00; }
+  50% { color: #FBB; }
+  100% { color: #F00; }
+}
+
+@keyframes blink {
+  0% { color: #F00; }
+  50% { color: #FBB; }
+  100% { color: #F00; }
+}
+
+button {
+  position: relative;
+  height: 100px;
+  width: 206px;
+  margin: 10px 5px;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  outline: none;
+  cursor: pointer;
+  background: #171616;
+  overflow: hidden;
+  transition: 0.6s;
+}
+button:first-child {
+  color: #1a81c5;
+  border-color: #29292b;
+}
+button:last-child{
+  color: #ffffff;
+  border-color: #e2e0e6;
+}
+button:before, button:after{
+  position: absolute;
+  content: '';
+  left: 0;
+  top: 0;
+  height: 100%;
+  filter: blur(30px);
+  opacity: 0.4;
+  transition: 0.9s;
+}
+button:before{
+  width: 60px;
+  background: rgba(255,255,255,0.6);
+  transform: translateX(-130px) skewX(-45deg);
+}
+button:after{
+  width: 30px;
+  background: rgba(255,255,255,0.6);
+  transform: translateX(-130px) skewX(-45deg);
+}
+button:hover:before,
+button:hover:after{
+  opacity: 0.6;
+  transform: translateX(320px) skewX(-45deg);
+}
+button:hover{
+  color: #f9f2f2;
+}
+button:hover:first-child{
+  background: #535157;
+}
+button:hover:last-child{
+  background: #ff8000;
+}
+
