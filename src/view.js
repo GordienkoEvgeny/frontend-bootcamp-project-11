@@ -32,9 +32,7 @@ inputForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const formData = new FormData(event.target);
   const url = formData.get('url');
-  console.log(typeof url);
   const validateErrors = validate({ url });
-  console.log(validateErrors);
   if (_.isEmpty(validateErrors)) {
     watchedState.data.push(url);
     watchedState.feedback = 'RSS успешно загружен';
@@ -43,11 +41,15 @@ inputForm.addEventListener('submit', (event) => {
     watchedState.feedbackColor = 'green';
     feedbackForm.classList.add(state.feedbackColor);
     feedbackForm.textContent = state.feedback;
+    inputForm.reset();
+    formControl.focus();
   } else {
     watchedState.feedback = validateErrors;
     feedbackForm.classList.remove('green');
-    feedbackForm.classList.add('blink');
+    watchedState.feedbackColor = 'blink';
+    feedbackForm.classList.add(state.feedbackColor);
     feedbackForm.textContent = state.feedback.url.message;
     formControl.classList.add('is-invalid');
   }
 });
+formControl.focus();
