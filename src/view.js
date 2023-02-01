@@ -80,8 +80,8 @@ export default () => {
   const validate = (field) => {
     const schema = yup.object().shape({
       url: yup.string().required()
-        .url(`${i18nInstance.t('errorValidUrl')}`)
-        .notOneOf(state.links, `${i18nInstance.t('errorPresence')}`),
+        .url('errorURL')
+        .notOneOf(state.links, 'errPresence'),
     });
     try {
       schema.validateSync(field, { abortEarly: false });
@@ -96,6 +96,7 @@ export default () => {
     const formData = new FormData(event.target);
     const url = formData.get('url');
     const validateErrors = validate({ url });
+    console.log(validateErrors);
     if (_.isEmpty(validateErrors)) {
       watchedState.links.push(url);
       watchedState.feedbackKey = 'done';
@@ -104,7 +105,7 @@ export default () => {
       inputForm.reset();
       formControl.focus();
     } else {
-      if (validateErrors.url.message.slice(0, 6) === 'Ссылка') {
+      if (validateErrors.url.message === 'errorURL') {
         watchedState.feedbackKey = 'errorValidUrl';
       } else {
         watchedState.feedbackKey = 'errorPresence';
