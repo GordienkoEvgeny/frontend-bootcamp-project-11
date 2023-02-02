@@ -2,6 +2,7 @@ import * as yup from 'yup';
 import _ from 'lodash';
 import onChange from 'on-change';
 import i18n from 'i18next';
+import axios from 'axios';
 import resources from './locales/index.js';
 
 export default () => {
@@ -16,9 +17,13 @@ export default () => {
   const textFrame = document.querySelector('label[for="url-input"]');
   const textUnderFrame = document.querySelector('.text-muted');
   const buttonAdd = document.querySelector('button[type="submit"]');
+  const feedsForm = document.querySelector('#feeds');
+  const feedsGroup = document.querySelector('#feeds-group');
 
   const state = {
     links: [],
+    feeds: [],
+    posts: [],
     feedbackKey: null,
     errorStatus: 'valid',
     feedbackColor: 'blink',
@@ -33,6 +38,8 @@ export default () => {
   }).then(() => {});
 
   const render = () => {
+    inputForm.reset();
+    formControl.focus();
     header.textContent = `${i18nInstance.t('keyHead')}`;
     bottomHeader.textContent = `${i18nInstance.t('keyBottomHead')}`;
     textFrame.textContent = `${i18nInstance.t('keyLink')}`;
@@ -63,8 +70,27 @@ export default () => {
     }
   };
 
+  const renderFeeds = () => {
+    feedsForm.textContent = `${i18nInstance.t('keyFeeds')}`;
+    feedsGroup.innerHTML = ''; // ЭТО ВАЖНО! очищает ul перед добавлением фидов
+    state.feeds.forEach((feed) => {
+      const liElem = document.createElement('li');
+      liElem.classList.add('list-group-item', 'border-0', 'border-end-0');
+      const h3Elem = document.createElement('h3');
+      h3Elem.classList.add('h6', 'm-0');
+      const pElem = document.createElement('p');
+      pElem.classList.add('m-0', 'small', 'text-black-50');
+      h3Elem.append(feed.title);
+      pElem.append(feed.description);
+      liElem.append(h3Elem);
+      liElem.append(pElem);
+      feedsGroup.prepend(liElem);
+    });
+  };
+
   const watchedState = onChange(state, () => { // WATCHED-STATE
     render();
+    renderFeeds();
   });
 
   englishLanguageButton.addEventListener('click', () => {
@@ -91,19 +117,60 @@ export default () => {
     }
   };
 
+  const parseRSS = (responseData) => {
+    const parser = new DOMParser();
+    const dataDOM = parser.parseFromString(responseData, 'text/xml');
+    if (dataDOM.querySelector('parseerror')) {
+      throw new Error('parseError');
+    }
+    return dataDOM;
+  };
+
+  const getFeed = (dataDOM) => {
+    console.log(dataDOM);
+    const title = dataDOM.querySelector('title').textContent;
+    const description = dataDOM.querySelector('description').textContent;
+    console.log(title, description);
+    return ({ title, description });
+  };
+
+  const getPosts = (dataDom) => {
+    const posts = dataDom.querySelectorAll();
+    console.log(posts);
+  };
+
+  const getProxy = (stateURL) => {
+    const proxy = new URL('https://allorigins.hexlet.app');
+    proxy.pathname = '/get';
+    proxy.searchParams.set('url', stateURL);
+    return proxy.toString();
+  };
+
+  const requestAndAddDataToLists = (link) => {
+    const proxyURL = getProxy(link);
+    axios.get(proxyURL)
+      .then((response) => {
+        const dataDOM = parseRSS(response.data.contents);
+        watchedState.feeds.push(getFeed(dataDOM));
+        console.log(state.feeds);
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
+
   inputForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
     const url = formData.get('url');
     const validateErrors = validate({ url });
-    console.log(validateErrors);
     if (_.isEmpty(validateErrors)) {
+      feedsForm.textContent = 'Фиды';
       watchedState.links.push(url);
       watchedState.feedbackKey = 'done';
       watchedState.feedbackColor = 'green';
       watchedState.errorStatus = 'valid';
-      inputForm.reset();
-      formControl.focus();
+      requestAndAddDataToLists(url);
     } else {
       if (validateErrors.url.message === 'errorURL') {
         watchedState.feedbackKey = 'errorValidUrl';
