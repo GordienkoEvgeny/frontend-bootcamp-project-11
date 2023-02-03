@@ -8,6 +8,10 @@ export default {
     errorValidUrl: 'Ссылка должна быть валидным URL',
     errorPresence: 'Данный RSS уже существует!',
     done: 'RSS успешно загружен',
-    keyFeeds: 'Фиды',
+    keyFeeds: 'Фиды:',
+    keyView: 'Просмотр',
+    keyPosts: 'Посты:',
+    modalButtonRead: 'Читать полностью',
+    closeModalWindow: 'Закрыть',
   },
 };

@@ -8,6 +8,10 @@ export default {
     errorValidUrl: 'Link must be a valid URL',
     errorPresence: 'This RSS already exists!',
     done: 'RSS uploaded successfully',
-    keyFeeds: 'Feeds',
+    keyFeeds: 'Feeds:',
+    keyView: 'View',
+    keyPosts: 'Posts:',
+    modalButtonRead: 'Read completely',
+    closeModalWindow: 'Close',
   },
 };

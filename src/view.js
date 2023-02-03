@@ -19,7 +19,8 @@ export default () => {
   const buttonAdd = document.querySelector('button[type="submit"]');
   const feedsForm = document.querySelector('#feeds');
   const feedsGroup = document.querySelector('#feeds-group');
-
+  const postsForm = document.querySelector('#posts');
+  const postsGroup = document.querySelector('#posts-group');
   const state = {
     links: [],
     feeds: [],
@@ -40,6 +41,8 @@ export default () => {
   const render = () => {
     inputForm.reset();
     formControl.focus();
+    postsForm.textContent = `${i18nInstance.t('keyPosts')}`;
+    feedsForm.textContent = `${i18nInstance.t('keyFeeds')}`;
     header.textContent = `${i18nInstance.t('keyHead')}`;
     bottomHeader.textContent = `${i18nInstance.t('keyBottomHead')}`;
     textFrame.textContent = `${i18nInstance.t('keyLink')}`;
@@ -71,15 +74,14 @@ export default () => {
   };
 
   const renderFeeds = () => {
-    feedsForm.textContent = `${i18nInstance.t('keyFeeds')}`;
-    feedsGroup.innerHTML = ''; // ЭТО ВАЖНО! очищает ul перед добавлением фидов
+    feedsGroup.innerHTML = ''; //  очищает ul перед добавлением фидов
     state.feeds.forEach((feed) => {
       const liElem = document.createElement('li');
       liElem.classList.add('list-group-item', 'border-0', 'border-end-0');
       const h3Elem = document.createElement('h3');
       h3Elem.classList.add('h6', 'm-0');
       const pElem = document.createElement('p');
-      pElem.classList.add('m-0', 'small', 'text-black-50');
+      pElem.classList.add('m-0', 'small', 'text-black-50', 'bb');
       h3Elem.append(feed.title);
       pElem.append(feed.description);
       liElem.append(h3Elem);
@@ -88,9 +90,46 @@ export default () => {
     });
   };
 
+  const renderPosts = () => {
+    postsGroup.innerHTML = ''; //  очищает ul перед добавлением постов
+    state.posts.forEach((post) => {
+      const modalTitle = document.querySelector('.modal-title');
+      const readCompletelyModalButton = document.querySelector('.full-article');
+      const closeModalWindowBtn = document.querySelector('.btn-secondary');
+      const liElem = document.createElement('li');
+      liElem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+      const aElem = document.createElement('a');
+      aElem.setAttribute('id', post.id);
+      aElem.setAttribute('href', post.link);
+      aElem.textContent = post.title;
+      const postButton = document.createElement('button');
+      const divElem = document.createElement('div');
+      divElem.classList.add('col-auto');
+      postButton.setAttribute('type', 'button');
+      postButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+      postButton.setAttribute('data-id', post.id);
+      postButton.setAttribute('data-bs-toggle', 'modal');
+      postButton.setAttribute('data-bs-target', '#modal');
+      postButton.textContent = `${i18nInstance.t('keyView')}`;
+      liElem.append(aElem);
+      divElem.append(postButton);
+      liElem.append(divElem);
+      postsGroup.prepend(liElem);
+      postButton.addEventListener('click', (e) => {
+        const idButton = e.target.getAttribute('data-id');
+        const currentPost = state.posts.find(({ id }) => idButton === id);
+        modalTitle.textContent = currentPost.title;
+        readCompletelyModalButton.textContent = `${i18nInstance.t('modalButtonRead')}`;
+        closeModalWindowBtn.textContent = `${i18nInstance.t('closeModalWindow')}`;
+        readCompletelyModalButton.setAttribute('href', currentPost.link);
+      });
+    });
+  };
+
   const watchedState = onChange(state, () => { // WATCHED-STATE
     render();
     renderFeeds();
+    renderPosts();
   });
 
   englishLanguageButton.addEventListener('click', () => {
@@ -127,16 +166,19 @@ export default () => {
   };
 
   const getFeed = (dataDOM) => {
-    console.log(dataDOM);
-    const title = dataDOM.querySelector('title').textContent;
+    const titleFeed = dataDOM.querySelector('title').textContent;
     const description = dataDOM.querySelector('description').textContent;
-    console.log(title, description);
-    return ({ title, description });
+    watchedState.feeds.push({ title: titleFeed, description });
   };
 
   const getPosts = (dataDom) => {
-    const posts = dataDom.querySelectorAll();
-    console.log(posts);
+    const postsContent = dataDom.querySelectorAll('item');
+    postsContent.forEach((post) => {
+      const id = _.uniqueId();
+      const postTitle = post.querySelector('title').textContent;
+      const postLink = post.querySelector('link').textContent;
+      watchedState.posts.push({ id, title: postTitle, link: postLink });
+    });
   };
 
   const getProxy = (stateURL) => {
@@ -151,8 +193,8 @@ export default () => {
     axios.get(proxyURL)
       .then((response) => {
         const dataDOM = parseRSS(response.data.contents);
-        watchedState.feeds.push(getFeed(dataDOM));
-        console.log(state.feeds);
+        getFeed(dataDOM);
+        getPosts(dataDOM);
       })
       .catch((error) => {
         console.log(error.message);
@@ -165,7 +207,6 @@ export default () => {
     const url = formData.get('url');
     const validateErrors = validate({ url });
     if (_.isEmpty(validateErrors)) {
-      feedsForm.textContent = 'Фиды';
       watchedState.links.push(url);
       watchedState.feedbackKey = 'done';
       watchedState.feedbackColor = 'green';

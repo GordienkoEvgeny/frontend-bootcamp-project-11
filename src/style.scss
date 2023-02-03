@@ -4,6 +4,34 @@
   border-color: #eb9d18;
 }
 
+.bb {
+  border-bottom: 2px solid gray;
+}
+
+.bbh {
+  border-bottom: 4px solid dodgerblue;
+}
+
+a{
+  color: black;
+}
+
+a:active {
+  color: #FF0000;
+
+}
+
+a:hover {
+  color:royalblue;
+  text-decoration: underline
+}
+
+a:visited {
+  color: #b0b0b0;
+  text-decoration:none
+}
+
+
 .green {
   color: greenyellow;
 }
