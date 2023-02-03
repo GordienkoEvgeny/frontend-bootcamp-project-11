@@ -8,7 +8,7 @@ import resources from './locales/index.js';
 export default () => {
   const inputForm = document.querySelector('.rss-form');
   const feedbackForm = document.querySelector('.feedback');
-  const formControl = document.querySelector('.form-control');
+  const formInput = document.querySelector('.form-control');
   const buttonGroup = document.querySelector('.btn-group');
   const russianLanguageButton = buttonGroup.querySelector('#ru');
   const englishLanguageButton = buttonGroup.querySelector('#en');
@@ -25,10 +25,13 @@ export default () => {
     links: [],
     feeds: [],
     posts: [],
+    downloadStatus: 'loaded',
     feedbackKey: null,
+    disabled: false,
     errorStatus: 'valid',
-    feedbackColor: 'blink',
+    feedbackColor: 'green',
     currentLanguage: 'ru',
+
   };
 
   const i18nInstance = i18n.createInstance();
@@ -40,42 +43,51 @@ export default () => {
 
   const render = () => {
     inputForm.reset();
-    formControl.focus();
-    postsForm.textContent = `${i18nInstance.t('keyPosts')}`;
-    feedsForm.textContent = `${i18nInstance.t('keyFeeds')}`;
-    header.textContent = `${i18nInstance.t('keyHead')}`;
-    bottomHeader.textContent = `${i18nInstance.t('keyBottomHead')}`;
-    textFrame.textContent = `${i18nInstance.t('keyLink')}`;
-    textUnderFrame.textContent = `${i18nInstance.t('keyExample')}`;
-    buttonAdd.textContent = `${i18nInstance.t('keyAdd')}`;
-    if (state.errorStatus === 'valid') {
-      formControl.classList.remove('is-invalid');
-      feedbackForm.classList.remove('blink');
-      feedbackForm.classList.add(state.feedbackColor);
-      feedbackForm.textContent = `${i18nInstance.t(state.feedbackKey)}`;
+    formInput.focus();
+    buttonAdd.disabled = state.disabled;
+    formInput.disabled = state.disabled;
+    if (state.downloadStatus === 'loading') {
+      feedbackForm.textContent = `${i18nInstance.t('keyLoading')}`;
     } else {
-      feedbackForm.classList.remove('green');
-      feedbackForm.classList.add(state.feedbackColor);
-      feedbackForm.textContent = `${i18nInstance.t(state.feedbackKey)}`;
-      formControl.classList.add('is-invalid');
-    }
+      postsForm.textContent = `${i18nInstance.t('keyPosts')}`;
+      feedsForm.textContent = `${i18nInstance.t('keyFeeds')}`;
+      header.textContent = `${i18nInstance.t('keyHead')}`;
+      bottomHeader.textContent = `${i18nInstance.t('keyBottomHead')}`;
+      textFrame.textContent = `${i18nInstance.t('keyLink')}`;
+      textUnderFrame.textContent = `${i18nInstance.t('keyExample')}`;
+      buttonAdd.textContent = `${i18nInstance.t('keyAdd')}`;
+      if (state.errorStatus === 'valid') {
+        formInput.classList.remove('is-invalid');
+        feedbackForm.classList.remove('blink');
+        feedbackForm.classList.add(state.feedbackColor);
+        feedbackForm.textContent = `${i18nInstance.t(state.feedbackKey)}`;
+      } else {
+        feedbackForm.classList.remove('green');
+        feedbackForm.classList.add(state.feedbackColor);
+        feedbackForm.textContent = `${i18nInstance.t(state.feedbackKey)}`;
+        formInput.classList.add('is-invalid');
+      }
 
-    if (state.currentLanguage === 'ru') {
-      englishLanguageButton.classList.remove('btn-primary');
-      englishLanguageButton.classList.add('btn-outline-primary');
-      russianLanguageButton.classList.remove('btn-outline-primary');
-      russianLanguageButton.classList.add('btn-primary');
-    } else {
-      russianLanguageButton.classList.remove('btn-primary');
-      russianLanguageButton.classList.add('btn-outline-primary');
-      englishLanguageButton.classList.remove('btn-outline-primary');
-      englishLanguageButton.classList.add('btn-primary');
+      if (state.currentLanguage === 'ru') {
+        englishLanguageButton.classList.remove('btn-primary');
+        englishLanguageButton.classList.add('btn-outline-primary');
+        russianLanguageButton.classList.remove('btn-outline-primary');
+        russianLanguageButton.classList.add('btn-primary');
+      } else {
+        russianLanguageButton.classList.remove('btn-primary');
+        russianLanguageButton.classList.add('btn-outline-primary');
+        englishLanguageButton.classList.remove('btn-outline-primary');
+        englishLanguageButton.classList.add('btn-primary');
+      }
     }
   };
 
   const renderFeeds = () => {
     feedsGroup.innerHTML = ''; //  очищает ul перед добавлением фидов
     state.feeds.forEach((feed) => {
+      // const idSearch = feed.feedId;
+      // console.log(idSearch);
+      // // if (feed.id)
       const liElem = document.createElement('li');
       liElem.classList.add('list-group-item', 'border-0', 'border-end-0');
       const h3Elem = document.createElement('h3');
@@ -165,10 +177,13 @@ export default () => {
     return dataDOM;
   };
 
+  // eslint-disable-next-line no-shadow
   const getFeed = (dataDOM) => {
     const titleFeed = dataDOM.querySelector('title').textContent;
     const description = dataDOM.querySelector('description').textContent;
-    watchedState.feeds.push({ title: titleFeed, description });
+    const feedId = _.uniqueId();
+    watchedState.feeds.push({ feedId, title: titleFeed, description });
+    console.log(state.feeds);
   };
 
   const getPosts = (dataDom) => {
@@ -190,23 +205,44 @@ export default () => {
 
   const requestAndAddDataToLists = (link) => {
     const proxyURL = getProxy(link);
+    watchedState.disabled = true;
+    watchedState.downloadStatus = 'loading';
     axios.get(proxyURL)
       .then((response) => {
-        const dataDOM = parseRSS(response.data.contents);
-        getFeed(dataDOM);
-        getPosts(dataDOM);
+        // console.log(response);
+        if (response.status >= 500) {
+          watchedState.errorStatus = 'invalid';
+          watchedState.feedbackKey = 'networkErr';
+          watchedState.feedbackColor = 'blink';
+          watchedState.downloadStatus = 'loaded';
+        } else {
+          const dataDOM = parseRSS(response.data.contents);
+          getFeed(dataDOM);
+          getPosts(dataDOM);
+          watchedState.disabled = false;
+          watchedState.downloadStatus = 'loaded';
+        }
       })
-      .catch((error) => {
-        console.log(error.message);
+      .catch(() => {
+        // console.log('ERROR!');
+        watchedState.errorStatus = 'invalid';
+        watchedState.feedbackKey = 'errorLink';
+        watchedState.feedbackColor = 'blink';
+        watchedState.downloadStatus = 'loaded';
+        watchedState.disabled = false;
+        state.links.pop();
+        formInput.focus();
       });
-  };
-
+    console.log(state.posts, state.links, state.feeds);
+  //   Promise.all(state.links).then(() => setTimeout(() => requestAndAddDataToLists(link), 5000));
+  }; // ДОБАВЛЯЮТСЯ ФИДЫ!!
   inputForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
     const url = formData.get('url');
     const validateErrors = validate({ url });
     if (_.isEmpty(validateErrors)) {
+      watchedState.downloadStatus = 'loading';
       watchedState.links.push(url);
       watchedState.feedbackKey = 'done';
       watchedState.feedbackColor = 'green';
@@ -223,6 +259,6 @@ export default () => {
       watchedState.errorStatus = 'invalid';
     }
   });
-  formControl.focus();
+  formInput.focus();
   render();
 };
