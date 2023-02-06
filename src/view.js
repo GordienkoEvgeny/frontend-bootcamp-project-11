@@ -5,10 +5,6 @@ import i18n from 'i18next';
 import axios from 'axios';
 import resources from './locales/index.js';
 
-// eslint-disable-next-line max-len
-// При нажатии на кнопку ссылка должна окраситься  в посещенную ( МОЖНО ЛИ? реализовал через клс + есть осн у кнопки см. CSS)
-// толком не проверил ошибку когда нет интернета (но должно работать)
-
 export default () => {
   const inputForm = document.querySelector('.rss-form');
   const feedbackForm = document.querySelector('.feedback');
@@ -36,7 +32,7 @@ export default () => {
     feedbackColor: 'green',
     currentLanguage: 'ru',
     uiState: {
-      visitedLink: null,
+      visitedLinks: {},
     },
   };
 
@@ -117,6 +113,7 @@ export default () => {
       const liElem = document.createElement('li');
       liElem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
       const aElem = document.createElement('a');
+      aElem.classList.add('fw-bold');
       aElem.setAttribute('id', post.id);
       aElem.setAttribute('href', post.link);
       aElem.setAttribute('target', '_blank');
@@ -134,17 +131,26 @@ export default () => {
       divElem.append(postButton);
       liElem.append(divElem);
       postsGroup.prepend(liElem);
+      if (state.uiState.visitedLinks[post.id]) { // если в UI стейте есть id который был посещен
+        aElem.classList.remove('fw-bold'); // добавляется стиль посещенной ссылки
+        aElem.classList.add('fw-normal');
+        aElem.classList.add('visited-links');
+      }
+      aElem.addEventListener('click', () => {
+        state.uiState.visitedLinks[post.id] = true; // поменять на WatchSTATE
+        renderPosts();
+      });
       postButton.addEventListener('click', (e) => {
-        // aElem.classList.remove('fw-bold');
         const idButton = e.target.getAttribute('data-id');
         const currentPost = state.posts.find(({ id }) => idButton === id);
+        // eslint-disable-next-line max-len
+        state.uiState.visitedLinks[currentPost.id] = true; // при клике добавляю id поста в UI стейт!!!!!!!!!!
         modalTitle.textContent = currentPost.title;
         modalBody.textContent = currentPost.description;
         readCompletelyModalButton.textContent = `${i18nInstance.t('modalButtonRead')}`;
         closeModalWindowBtn.textContent = `${i18nInstance.t('closeModalWindow')}`;
         readCompletelyModalButton.setAttribute('href', currentPost.link);
-        aElem.classList.add('fw-normal');
-        aElem.classList.add('link-secondary');
+        renderPosts();
       });
     });
   };
@@ -200,12 +206,10 @@ export default () => {
   const getPosts = (dataDom) => {
     const postsContent = dataDom.querySelectorAll('item');
     postsContent.forEach((post) => {
-      console.log(post);
       const id = _.uniqueId();
       const postTitle = post.querySelector('title').textContent;
       const postLink = post.querySelector('link').textContent;
       const postDescription = post.querySelector('description').textContent;
-      console.log(postDescription);
       const checkPosts = (state.posts).find((content) => content.title === postTitle);
       if (!checkPosts) {
         watchedState.posts.push({
@@ -225,12 +229,8 @@ export default () => {
 
   const requestAndAddDataToLists = (link) => {
     const proxyURL = getProxy(link);
-    watchedState.disabled = true;
-    watchedState.downloadStatus = 'loading';
-    watchedState.feedbackColor = 'green';
     axios.get(proxyURL)
       .then((response) => {
-        // console.log(response);
         if (response.status >= 500) {
           watchedState.errorStatus = 'invalid';
           watchedState.feedbackKey = 'networkErr';
@@ -245,7 +245,6 @@ export default () => {
         }
       })
       .catch(() => {
-        // console.log('ERROR!');
         watchedState.errorStatus = 'invalid';
         watchedState.feedbackKey = 'errorLink';
         watchedState.feedbackColor = 'blink';
@@ -263,12 +262,14 @@ export default () => {
     const url = formData.get('url');
     const validateErrors = validate({ url });
     if (_.isEmpty(validateErrors)) {
+      watchedState.disabled = true;
       watchedState.downloadStatus = 'loading';
       watchedState.links.push(url);
       watchedState.feedbackKey = 'done';
       watchedState.feedbackColor = 'green';
       watchedState.errorStatus = 'valid';
       requestAndAddDataToLists(url);
+      watchedState.disabled = false;
     } else {
       if (validateErrors.url.message === 'errorURL') {
         watchedState.feedbackKey = 'errorValidUrl';
