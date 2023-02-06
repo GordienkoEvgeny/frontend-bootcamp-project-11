@@ -5,6 +5,10 @@ import i18n from 'i18next';
 import axios from 'axios';
 import resources from './locales/index.js';
 
+// eslint-disable-next-line max-len
+// При нажатии на кнопку ссылка должна окраситься  в посещенную ( МОЖНО ЛИ? реализовал через клс + есть осн у кнопки см. CSS)
+// толком не проверил ошибку когда нет интернета (но должно работать)
+
 export default () => {
   const inputForm = document.querySelector('.rss-form');
   const feedbackForm = document.querySelector('.feedback');
@@ -31,7 +35,9 @@ export default () => {
     errorStatus: 'valid',
     feedbackColor: 'green',
     currentLanguage: 'ru',
-
+    uiState: {
+      visitedLink: null,
+    },
   };
 
   const i18nInstance = i18n.createInstance();
@@ -43,12 +49,14 @@ export default () => {
 
   const render = () => {
     inputForm.reset();
-    formInput.focus();
     buttonAdd.disabled = state.disabled;
     formInput.disabled = state.disabled;
     if (state.downloadStatus === 'loading') {
+      feedbackForm.classList.remove('blink');
+      feedbackForm.classList.add(state.feedbackColor);
       feedbackForm.textContent = `${i18nInstance.t('keyLoading')}`;
     } else {
+      // formInput.focus();
       postsForm.textContent = `${i18nInstance.t('keyPosts')}`;
       feedsForm.textContent = `${i18nInstance.t('keyFeeds')}`;
       header.textContent = `${i18nInstance.t('keyHead')}`;
@@ -85,9 +93,6 @@ export default () => {
   const renderFeeds = () => {
     feedsGroup.innerHTML = ''; //  очищает ul перед добавлением фидов
     state.feeds.forEach((feed) => {
-      // const idSearch = feed.feedId;
-      // console.log(idSearch);
-      // // if (feed.id)
       const liElem = document.createElement('li');
       liElem.classList.add('list-group-item', 'border-0', 'border-end-0');
       const h3Elem = document.createElement('h3');
@@ -106,6 +111,7 @@ export default () => {
     postsGroup.innerHTML = ''; //  очищает ul перед добавлением постов
     state.posts.forEach((post) => {
       const modalTitle = document.querySelector('.modal-title');
+      const modalBody = document.querySelector('.modal-body');
       const readCompletelyModalButton = document.querySelector('.full-article');
       const closeModalWindowBtn = document.querySelector('.btn-secondary');
       const liElem = document.createElement('li');
@@ -113,6 +119,7 @@ export default () => {
       const aElem = document.createElement('a');
       aElem.setAttribute('id', post.id);
       aElem.setAttribute('href', post.link);
+      aElem.setAttribute('target', '_blank');
       aElem.textContent = post.title;
       const postButton = document.createElement('button');
       const divElem = document.createElement('div');
@@ -128,12 +135,16 @@ export default () => {
       liElem.append(divElem);
       postsGroup.prepend(liElem);
       postButton.addEventListener('click', (e) => {
+        // aElem.classList.remove('fw-bold');
         const idButton = e.target.getAttribute('data-id');
         const currentPost = state.posts.find(({ id }) => idButton === id);
         modalTitle.textContent = currentPost.title;
+        modalBody.textContent = currentPost.description;
         readCompletelyModalButton.textContent = `${i18nInstance.t('modalButtonRead')}`;
         closeModalWindowBtn.textContent = `${i18nInstance.t('closeModalWindow')}`;
         readCompletelyModalButton.setAttribute('href', currentPost.link);
+        aElem.classList.add('fw-normal');
+        aElem.classList.add('link-secondary');
       });
     });
   };
@@ -177,22 +188,30 @@ export default () => {
     return dataDOM;
   };
 
-  // eslint-disable-next-line no-shadow
   const getFeed = (dataDOM) => {
-    const titleFeed = dataDOM.querySelector('title').textContent;
+    const title = dataDOM.querySelector('title').textContent;
     const description = dataDOM.querySelector('description').textContent;
-    const feedId = _.uniqueId();
-    watchedState.feeds.push({ feedId, title: titleFeed, description });
-    console.log(state.feeds);
+    const checkFeeds = (state.feeds).find((content) => content.title === title);
+    if (!checkFeeds) {
+      watchedState.feeds.push({ title, description });
+    }
   };
 
   const getPosts = (dataDom) => {
     const postsContent = dataDom.querySelectorAll('item');
     postsContent.forEach((post) => {
+      console.log(post);
       const id = _.uniqueId();
       const postTitle = post.querySelector('title').textContent;
       const postLink = post.querySelector('link').textContent;
-      watchedState.posts.push({ id, title: postTitle, link: postLink });
+      const postDescription = post.querySelector('description').textContent;
+      console.log(postDescription);
+      const checkPosts = (state.posts).find((content) => content.title === postTitle);
+      if (!checkPosts) {
+        watchedState.posts.push({
+          id, title: postTitle, link: postLink, description: postDescription,
+        });
+      }
     });
   };
 
@@ -200,6 +219,7 @@ export default () => {
     const proxy = new URL('https://allorigins.hexlet.app');
     proxy.pathname = '/get';
     proxy.searchParams.set('url', stateURL);
+    proxy.searchParams.set('disableCache', true);
     return proxy.toString();
   };
 
@@ -207,6 +227,7 @@ export default () => {
     const proxyURL = getProxy(link);
     watchedState.disabled = true;
     watchedState.downloadStatus = 'loading';
+    watchedState.feedbackColor = 'green';
     axios.get(proxyURL)
       .then((response) => {
         // console.log(response);
@@ -233,10 +254,10 @@ export default () => {
         state.links.pop();
         formInput.focus();
       });
-    console.log(state.posts, state.links, state.feeds);
-  //   Promise.all(state.links).then(() => setTimeout(() => requestAndAddDataToLists(link), 5000));
-  }; // ДОБАВЛЯЮТСЯ ФИДЫ!!
+    Promise.all(state.links).then(() => setTimeout(() => requestAndAddDataToLists(link), 5000));
+  };
   inputForm.addEventListener('submit', (event) => {
+    formInput.focus();
     event.preventDefault();
     const formData = new FormData(event.target);
     const url = formData.get('url');
@@ -259,6 +280,5 @@ export default () => {
       watchedState.errorStatus = 'invalid';
     }
   });
-  formInput.focus();
   render();
 };
