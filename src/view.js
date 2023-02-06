@@ -72,17 +72,12 @@ export default () => {
         formInput.classList.add('is-invalid');
       }
 
-      if (state.currentLanguage === 'ru') {
-        englishLanguageButton.classList.remove('btn-primary');
-        englishLanguageButton.classList.add('btn-outline-primary');
-        russianLanguageButton.classList.remove('btn-outline-primary');
-        russianLanguageButton.classList.add('btn-primary');
-      } else {
-        russianLanguageButton.classList.remove('btn-primary');
-        russianLanguageButton.classList.add('btn-outline-primary');
-        englishLanguageButton.classList.remove('btn-outline-primary');
-        englishLanguageButton.classList.add('btn-primary');
-      }
+      const primaryLanguageButton = state.currentLanguage === 'ru' ? russianLanguageButton : englishLanguageButton; /// !!!!!!!!!!
+      const outlineLanguageButton = state.currentLanguage === 'en' ? russianLanguageButton : englishLanguageButton;
+      primaryLanguageButton.classList.remove('btn-outline-primary');
+      primaryLanguageButton.classList.add('btn-primary');
+      outlineLanguageButton.classList.add('btn-outline-primary');
+      outlineLanguageButton.classList.remove('btn-primary'); /// !!!!!!!!
     }
   };
 
@@ -161,14 +156,15 @@ export default () => {
     renderPosts();
   });
 
-  englishLanguageButton.addEventListener('click', () => {
-    i18nInstance.changeLanguage('en').then();
-    watchedState.currentLanguage = 'en';
-  });
-
-  russianLanguageButton.addEventListener('click', () => {
-    i18nInstance.changeLanguage('ru').then();
-    watchedState.currentLanguage = 'ru';
+  buttonGroup.addEventListener('click', (event) => {
+    const currentLanguageButton = event.target.getAttribute('id');
+    if (currentLanguageButton === 'ru') {
+      i18nInstance.changeLanguage('ru').then();
+      watchedState.currentLanguage = 'ru';
+    } else {
+      i18nInstance.changeLanguage('en').then();
+      watchedState.currentLanguage = 'en';
+    }
   });
 
   const validate = (field) => {
