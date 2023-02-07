@@ -22,6 +22,7 @@ export default () => {
   const postsForm = document.querySelector('#posts');
   const postsGroup = document.querySelector('#posts-group');
   const state = {
+    blackList: [],
     links: [],
     feeds: [],
     posts: [],
@@ -181,10 +182,14 @@ export default () => {
     }
   };
 
-  const parseRSS = (responseData) => {
+  const parseRSS = (responseData, link) => {
+    // console.log(responseData);
     const parser = new DOMParser();
     const dataDOM = parser.parseFromString(responseData, 'text/xml');
-    if (dataDOM.querySelector('parseerror')) {
+    // console.log(dataDOM.querySelector('parsererror'));
+    if (dataDOM.querySelector('parsererror')) {
+      // return null;
+      watchedState.blackList.push(link);
       throw new Error('parseError');
     }
     return dataDOM;
@@ -224,31 +229,35 @@ export default () => {
   };
 
   const requestAndAddDataToLists = (link) => {
-    const proxyURL = getProxy(link);
-    axios.get(proxyURL)
-      .then((response) => {
-        if (response.status >= 500) {
-          watchedState.errorStatus = 'invalid';
-          watchedState.feedbackKey = 'networkErr';
-          watchedState.feedbackColor = 'blink';
-          watchedState.downloadStatus = 'loaded';
-        } else {
-          const dataDOM = parseRSS(response.data.contents);
+    const check = (state.blackList).find((bLink) => bLink === link);
+    if (!check) {
+      const proxyURL = getProxy(link);
+      console.log('URL', proxyURL);
+      console.log(state.links);
+      axios.get(proxyURL)
+        .then((response) => {
+          const dataDOM = parseRSS(response.data.contents, link);
+          console.log(dataDOM);
           getFeed(dataDOM);
           getPosts(dataDOM);
           watchedState.disabled = false;
           watchedState.downloadStatus = 'loaded';
-        }
-      })
-      .catch(() => {
-        watchedState.errorStatus = 'invalid';
-        watchedState.feedbackKey = 'errorLink';
-        watchedState.feedbackColor = 'blink';
-        watchedState.downloadStatus = 'loaded';
-        watchedState.disabled = false;
-        state.links.pop();
-        formInput.focus();
-      });
+          const checkLinks = (state.links).find((stateLinks) => stateLinks === link);
+          if (!checkLinks) {
+            watchedState.links.push(link);
+          }
+        })
+        .catch((error) => {
+          // eslint-disable-next-line no-unused-expressions
+          error.message === 'parseError' ? watchedState.feedbackKey = 'errorLink' : watchedState.feedbackKey = 'networkErr';
+          watchedState.errorStatus = 'invalid';
+          watchedState.feedbackColor = 'blink';
+          watchedState.downloadStatus = 'loaded';
+          watchedState.disabled = false;
+          formInput.focus();
+        });
+    }
+
     Promise.all(state.links).then(() => setTimeout(() => requestAndAddDataToLists(link), 5000));
   };
   inputForm.addEventListener('submit', (event) => {
@@ -260,7 +269,6 @@ export default () => {
     if (_.isEmpty(validateErrors)) {
       watchedState.disabled = true;
       watchedState.downloadStatus = 'loading';
-      watchedState.links.push(url);
       watchedState.feedbackKey = 'done';
       watchedState.feedbackColor = 'green';
       watchedState.errorStatus = 'valid';
