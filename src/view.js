@@ -69,6 +69,7 @@ export const renderPosts = () => {
     aElem.setAttribute('id', post.id);
     aElem.setAttribute('href', post.link);
     aElem.setAttribute('target', '_blank');
+    aElem.setAttribute('rel', 'noopener noreferrer');
     aElem.textContent = post.title;
     const postButton = document.createElement('button');
     const divElem = document.createElement('div');
