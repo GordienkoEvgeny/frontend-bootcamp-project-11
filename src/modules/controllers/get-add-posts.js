@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import { state } from '../appState.js';
-import { watchedState } from '../helpers/watcher.js';
+import state from '../appState.js';
+import watchedState from '../helpers/watcher.js';
 
-export const getAndAddPosts = (dataDom) => {
+const getAndAddPosts = (dataDom) => {
   const postsContent = dataDom.querySelectorAll('item');
   postsContent.forEach((post) => {
     const id = _.uniqueId();
@@ -17,3 +17,5 @@ export const getAndAddPosts = (dataDom) => {
     }
   });
 };
+
+export default getAndAddPosts;

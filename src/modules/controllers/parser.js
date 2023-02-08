@@ -1,6 +1,6 @@
-import { watchedState } from '../helpers/watcher.js';
+import watchedState from '../helpers/watcher.js';
 
-export const parseRSS = (responseData, link) => {
+const parseRSS = (responseData, link) => {
   const parser = new DOMParser();
   const dataDOM = parser.parseFromString(responseData, 'text/xml');
   if (dataDOM.querySelector('parsererror')) {
@@ -9,3 +9,5 @@ export const parseRSS = (responseData, link) => {
   }
   return dataDOM;
 };
+
+export default parseRSS;

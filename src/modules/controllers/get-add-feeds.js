@@ -1,7 +1,7 @@
-import { state } from '../appState.js';
-import { watchedState } from '../helpers/watcher.js';
+import state from '../appState.js';
+import watchedState from '../helpers/watcher.js';
 
-export const getAndAddFeeds = (dataDOM) => {
+const getAndAddFeeds = (dataDOM) => {
   const title = dataDOM.querySelector('title').textContent;
   const feedDescription = dataDOM.querySelector('description').textContent;
   const checkFeeds = (state.feeds).find((content) => content.title === title);
@@ -9,3 +9,5 @@ export const getAndAddFeeds = (dataDOM) => {
     watchedState.feeds.push({ title, description: feedDescription });
   }
 };
+
+export default getAndAddFeeds;

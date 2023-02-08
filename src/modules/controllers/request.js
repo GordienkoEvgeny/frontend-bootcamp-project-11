@@ -1,13 +1,13 @@
 import axios from 'axios';
-import { state } from '../appState.js';
-import { getProxy } from './get-proxy.js';
-import { parseRSS } from './parser.js';
-import { getAndAddFeeds } from './get-add-feeds.js';
-import { getAndAddPosts } from './get-add-posts.js';
-import { watchedState } from '../helpers/watcher.js';
+import state from '../appState.js';
+import getProxy from './get-proxy.js';
+import parseRSS from './parser.js';
+import getAndAddFeeds from './get-add-feeds.js';
+import getAndAddPosts from './get-add-posts.js';
+import watchedState from '../helpers/watcher.js';
 import * as component from '../UI.js';
 
-export const request = (link) => {
+const request = (link) => {
   const checkBlackList = (state.blackList).find((bLink) => bLink === link);
   if (!checkBlackList) {
     const proxyURL = getProxy(link);
@@ -24,6 +24,7 @@ export const request = (link) => {
         }
       })
       .catch((error) => {
+        // eslint-disable-next-line no-unused-expressions
         error.message === 'parseError'
           ? watchedState.feedbackKey = 'errorLink'
           : watchedState.feedbackKey = 'networkErr';
@@ -37,3 +38,4 @@ export const request = (link) => {
 
   Promise.all(state.links).then(() => setTimeout(() => request(link), 5000));
 };
+export default request;

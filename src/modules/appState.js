@@ -1,4 +1,4 @@
-export const state = {
+const state = {
   blackList: [],
   links: [],
   feeds: [],
@@ -13,3 +13,5 @@ export const state = {
     visitedLinks: {},
   },
 };
+
+export default state;

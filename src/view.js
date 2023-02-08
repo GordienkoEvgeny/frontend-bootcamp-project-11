@@ -65,24 +65,24 @@ export const renderPosts = () => {
     const liElem = document.createElement('li');
     liElem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     const aElem = document.createElement('a');
-    aElem.setAttribute('href', post.link);
     aElem.classList.add('fw-bold');
     aElem.setAttribute('id', post.id);
+    aElem.setAttribute('href', post.link);
     aElem.setAttribute('target', '_blank');
     aElem.setAttribute('rel', 'noopener noreferrer');
     aElem.textContent = post.title;
     const postButton = document.createElement('button');
-    // const divElem = document.createElement('div');
-    // divElem.classList.add('col-auto');
+    const divElem = document.createElement('div');
+    divElem.classList.add('col-auto');
     postButton.setAttribute('type', 'button');
-    postButton.classList.add('btn', 'btn-outline-primary', 'btn-sm', 'pbt');
+    postButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
     postButton.setAttribute('data-id', post.id);
     postButton.setAttribute('data-bs-toggle', 'modal');
     postButton.setAttribute('data-bs-target', '#modal');
     postButton.textContent = `${i18nInstance.t('keyView')}`;
-    liElem.append(postButton);
-    liElem.prepend(aElem);
-    // liElem.append(divElem);
+    liElem.append(aElem);
+    divElem.append(postButton);
+    liElem.append(divElem);
     component.postsListForm.prepend(liElem);
     if (state.uiState.visitedLinks[post.id]) { // если в UI стейте есть id который был посещен
       aElem.classList.remove('fw-bold'); // добавляется стиль посещенной ссылки

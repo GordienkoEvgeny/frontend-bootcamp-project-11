@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import * as component from '../UI.js';
-import { i18nInstance } from '../helpers/i18n.js';
-import { watchedState } from '../helpers/watcher.js';
-import { validate } from '../validator.js';
-import { request } from './request.js';
+import i18nInstance from '../helpers/i18n.js';
+import watchedState from '../helpers/watcher.js';
+import validate from '../validator.js';
+import request from './request.js';
 import { render } from '../../view.js';
 
 export default () => {
