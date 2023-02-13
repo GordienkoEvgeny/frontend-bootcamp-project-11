@@ -1,7 +1,6 @@
 import * as component from './modules/UI.js';
 import state from './modules/appState.js';
 import i18nInstance from './modules/helpers/i18n.js';
-// eslint-disable-next-line import/no-cycle
 import watchedState from './modules/helpers/watcher.js';
 
 export const render = () => {
