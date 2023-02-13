@@ -1,6 +1,7 @@
 import axios from 'axios';
 import state from '../appState.js';
 import getProxy from './get-proxy.js';
+// eslint-disable-next-line import/no-cycle
 import { parseRSS, getAndAddFeeds, getAndAddPosts } from './parser.js';
 import watchedState from '../helpers/watcher.js';
 

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import * as component from '../UI.js';
+// eslint-disable-next-line import/no-cycle
 import i18nInstance from '../helpers/i18n.js';
 import watchedState from '../helpers/watcher.js';
 import validate from '../validator.js';

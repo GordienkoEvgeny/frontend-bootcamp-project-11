@@ -1,4 +1,5 @@
 import _ from 'lodash';
+// eslint-disable-next-line import/no-cycle
 import watchedState from '../helpers/watcher.js';
 import state from '../appState.js';
 
