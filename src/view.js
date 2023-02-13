@@ -39,6 +39,7 @@ export const render = () => {
     notPrimeLanguageButton.classList.add('btn-outline-primary');
     notPrimeLanguageButton.classList.remove('btn-primary'); /// !!!!!!!!
   }
+  component.addForm.focus();
 };
 export const renderFeeds = () => {
   component.feedsListForm.innerHTML = ''; //  очищает ul перед добавлением фидов

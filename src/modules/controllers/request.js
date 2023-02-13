@@ -1,11 +1,8 @@
 import axios from 'axios';
 import state from '../appState.js';
 import getProxy from './get-proxy.js';
-import parseRSS from './parser.js';
-import getAndAddFeeds from './get-add-feeds.js';
-import getAndAddPosts from './get-add-posts.js';
+import { parseRSS, getAndAddFeeds, getAndAddPosts } from './parser.js';
 import watchedState from '../helpers/watcher.js';
-import * as component from '../UI.js';
 
 const request = (link) => {
   const checkBlackList = (state.blackList).find((bLink) => bLink === link);
@@ -32,7 +29,6 @@ const request = (link) => {
         watchedState.feedbackColor = 'blink';
         watchedState.downloadStatus = 'loaded';
         watchedState.disabled = false;
-        component.addForm.focus();
       });
   }
 

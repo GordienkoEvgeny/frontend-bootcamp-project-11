@@ -1,5 +1,5 @@
 import 'bootstrap';
 import './style.scss';
-import runApp from './modules/controllers/event-listeners.js';
+import initApp from './init-app.js';
 
-runApp();
+initApp();

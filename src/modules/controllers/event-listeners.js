@@ -18,7 +18,6 @@ export default () => {
     }
   });
   component.inputSubmitForm.addEventListener('submit', (event) => {
-    component.addForm.focus();
     event.preventDefault();
     const formData = new FormData(event.target);
     const url = formData.get('url');
@@ -37,7 +36,6 @@ export default () => {
       } else {
         watchedState.feedbackKey = 'errorPresence';
       }
-      component.statusForm.classList.remove('green');
       watchedState.feedbackColor = 'blink';
       watchedState.errorStatus = 'invalid';
     }
