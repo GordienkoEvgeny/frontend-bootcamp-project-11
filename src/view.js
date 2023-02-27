@@ -33,12 +33,12 @@ export const render = () => {
       component.addForm.classList.add('is-invalid');
     }
 
-    const primeLanguageButton = state.currentLanguage === 'ru' ? component.russianLanguageButton : component.englishLanguageButton; 
+    const primeLanguageButton = state.currentLanguage === 'ru' ? component.russianLanguageButton : component.englishLanguageButton;
     const notPrimeLanguageButton = state.currentLanguage === 'en' ? component.russianLanguageButton : component.englishLanguageButton;
     primeLanguageButton.classList.remove('btn-outline-primary');
     primeLanguageButton.classList.add('btn-primary');
     notPrimeLanguageButton.classList.add('btn-outline-primary');
-    notPrimeLanguageButton.classList.remove('btn-primary'); 
+    notPrimeLanguageButton.classList.remove('btn-primary');
   }
   component.addForm.focus();
 };
@@ -61,7 +61,7 @@ export const renderFeeds = () => {
 export const renderPosts = () => {
   component.postsListForm.innerHTML = ''; //  очищает ul перед добавлением постов
   state.posts.forEach((post) => {
-    const modalTitle = document.querySelector('.modal-title'); 
+    const modalTitle = document.querySelector('.modal-title');
     const modalBody = document.querySelector('.modal-body');
     const readCompletelyModalButton = document.querySelector('.full-article');
     const closeModalWindowBtn = document.querySelector('.btn-secondary');
@@ -95,7 +95,7 @@ export const renderPosts = () => {
     postButton.addEventListener('click', (e) => {
       const idButton = e.target.getAttribute('data-id');
       const currentPost = watchedState.posts.find(({ id }) => idButton === id);
-      watchedState.uiState.visitedLinks[currentPost.id] = true; 
+      watchedState.uiState.visitedLinks[currentPost.id] = true;
       modalTitle.textContent = currentPost.title;
       modalBody.textContent = currentPost.description;
       readCompletelyModalButton.textContent = `${i18nInstance.t('modalButtonRead')}`;
